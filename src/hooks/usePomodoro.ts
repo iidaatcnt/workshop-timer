@@ -5,7 +5,7 @@ export type TimerMode = 'focus' | 'break';
 const FOCUS_TIME = 25 * 60; // 25 minutes
 const BREAK_TIME = 5 * 60;  // 5 minutes
 
-export function usePomodoro() {
+export function usePomodoro(onComplete?: () => void) {
     const [mode, setMode] = useState<TimerMode>('focus');
     const [timeLeft, setTimeLeft] = useState(FOCUS_TIME);
     const [isActive, setIsActive] = useState(false);
@@ -15,7 +15,7 @@ export function usePomodoro() {
         const nextMode = mode === 'focus' ? 'break' : 'focus';
         setMode(nextMode);
         setTimeLeft(nextMode === 'focus' ? FOCUS_TIME : BREAK_TIME);
-        setIsActive(false); // Pause on switch? Or auto-start? Let's pause.
+        setIsActive(false);
     }, [mode]);
 
     const toggleTimer = useCallback(() => {
@@ -34,15 +34,16 @@ export function usePomodoro() {
             interval = setInterval(() => {
                 setTimeLeft((prev) => prev - 1);
             }, 1000);
-        } else if (timeLeft === 0) {
-            // Timer finished
+        } else if (timeLeft === 0 && isActive) {
+            // Timer finished naturally
             setIsActive(false);
-            // Optional: Play sound here
-            // For now, just stop.
+            if (onComplete) {
+                onComplete();
+            }
         }
 
         return () => clearInterval(interval);
-    }, [isActive, timeLeft]);
+    }, [isActive, timeLeft, onComplete]);
 
     return {
         mode,
