@@ -2,7 +2,7 @@
 
 import { usePomodoro } from '@/hooks/usePomodoro';
 import { cn } from '@/lib/utils';
-import { Play, Pause, RotateCcw, SkipForward, Coffee, MessageCircle } from 'lucide-react';
+import { Play, Pause, RotateCcw, SkipForward, Coffee, MessageCircle, Heart, Sparkles } from 'lucide-react';
 
 export function PomodoroApp() {
     const { mode, timeLeft, isActive, toggleTimer, resetTimer, switchMode, progress } = usePomodoro();
@@ -15,94 +15,117 @@ export function PomodoroApp() {
     };
 
     // Dynamic Styles based on mode
+    // Focus (Mokumoku) = Mint Green / Teal (Calm, Concentration)
+    // Chat (Break) = Soft Pink / Rose (Warm, Love, Relax)
     const isFocus = mode === 'focus';
 
     return (
         <div className={cn(
-            "min-h-screen w-full flex flex-col items-center justify-center transition-colors duration-700 ease-in-out",
-            isFocus ? "bg-zinc-950 text-emerald-400" : "bg-orange-50 text-orange-600"
+            "min-h-screen w-full flex flex-col items-center justify-center transition-colors duration-700 ease-in-out font-sans",
+            isFocus ? "bg-teal-50" : "bg-rose-50"
         )}>
 
             {/* Title / Header */}
-            <header className="absolute top-8 text-center space-y-2">
-                <h1 className="text-3xl font-black tracking-widest uppercase">
-                    {isFocus ? "MOKUMOKU TIME" : "CHAT TIME"}
+            <header className="absolute top-12 text-center space-y-3 z-10">
+                <div className={cn(
+                    "inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold shadow-sm mb-2",
+                    isFocus ? "bg-teal-100 text-teal-700" : "bg-rose-100 text-rose-700"
+                )}>
+                    {isFocus ? <Sparkles className="w-4 h-4" /> : <Heart className="w-4 h-4" />}
+                    <span>{isFocus ? "Do your best!" : "Relax time"}</span>
+                </div>
+                <h1 className={cn(
+                    "text-4xl md:text-5xl font-bold tracking-tight drop-shadow-sm",
+                    isFocus ? "text-teal-800" : "text-rose-800"
+                )}>
+                    {isFocus ? "Mokumoku Time" : "Chat Time"}
                 </h1>
-                <p className={cn("text-sm font-medium opacity-70", isFocus ? "text-emerald-200" : "text-orange-400")}>
-                    {isFocus ? "Focus on your LINE Stickers!" : "Take a break & Chat!"}
+                <p className={cn("text-base font-medium opacity-80", isFocus ? "text-teal-600" : "text-rose-600")}>
+                    {isFocus ? "集中してがんばろう 🌿" : "ゆっくりおしゃべり ☕️"}
                 </p>
             </header>
 
             {/* Main Timer Circle */}
-            <div className="relative group">
-                {/* Decorative Ring */}
+            <div className="relative group mt-8">
+                {/* Decorative Ring / Bloom Effect */}
                 <div className={cn(
-                    "absolute -inset-4 rounded-full blur-xl opacity-30 transition-all duration-1000",
+                    "absolute -inset-6 rounded-full blur-2xl opacity-60 transition-all duration-1000",
                     isActive ? "scale-110" : "scale-100",
-                    isFocus ? "bg-emerald-500" : "bg-orange-500"
+                    isFocus ? "bg-teal-200" : "bg-rose-200"
                 )} />
 
                 <div className={cn(
-                    "relative w-72 h-72 rounded-full border-8 flex items-center justify-center bg-transparent z-10 transition-all duration-500",
-                    isFocus ? "border-emerald-900 bg-zinc-900/50" : "border-orange-200 bg-white/50"
+                    "relative w-72 h-72 md:w-80 md:h-80 rounded-full border-[10px] flex flex-col items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.05)] transition-all duration-500",
+                    isFocus 
+                        ? "border-teal-100 bg-white" 
+                        : "border-rose-100 bg-white"
                 )}>
-                    <span className="text-6xl font-black tabular-nums tracking-tighter">
+                    <span className={cn(
+                        "text-7xl md:text-8xl font-black tabular-nums tracking-tighter transition-colors",
+                        isFocus ? "text-teal-500" : "text-rose-400"
+                    )}>
                         {formatTime(timeLeft)}
+                    </span>
+                    <span className={cn(
+                        "mt-2 text-sm font-bold uppercase tracking-widest opacity-40",
+                        isFocus ? "text-teal-400" : "text-rose-400"
+                    )}>
+                        {isActive ? "Running" : "Paused"}
                     </span>
                 </div>
             </div>
 
             {/* Controls */}
-            <div className="mt-12 flex items-center gap-6">
+            <div className="mt-12 flex items-center gap-6 z-10">
                 <button
                     onClick={toggleTimer}
                     className={cn(
-                        "p-6 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-3 font-bold text-lg",
+                        "h-20 w-20 rounded-full shadow-lg transition-transform hover:scale-110 active:scale-95 flex items-center justify-center",
                         isFocus
-                            ? "bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-900/40"
-                            : "bg-orange-500 text-white hover:bg-orange-400 shadow-orange-200"
+                            ? "bg-teal-400 text-white hover:bg-teal-500 shadow-teal-200"
+                            : "bg-rose-400 text-white hover:bg-rose-500 shadow-rose-200"
                     )}
                 >
-                    {isActive ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
-                    {isActive ? "PAUSE" : "START"}
+                    {isActive ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current ml-1" />}
                 </button>
 
-                <button
-                    onClick={resetTimer}
-                    className={cn(
-                        "p-4 rounded-xl transition-colors hover:bg-black/5 dark:hover:bg-white/10",
-                        isFocus ? "text-emerald-500" : "text-orange-500"
-                    )}
-                    title="Reset"
-                >
-                    <RotateCcw className="w-6 h-6" />
-                </button>
-
-                <button
-                    onClick={switchMode}
-                    className={cn(
-                        "p-4 rounded-xl transition-colors hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-2 font-medium",
-                        isFocus ? "text-emerald-500" : "text-orange-500"
-                    )}
-                    title={isFocus ? "Switch to Chat" : "Switch to Focus"}
-                >
-                    <SkipForward className="w-6 h-6" />
-                    <span className="uppercase text-xs tracking-wide">
-                        {isFocus ? "Break" : "Focus"}
-                    </span>
-                </button>
+                <div className="flex flex-col gap-3">
+                    <button
+                        onClick={resetTimer}
+                        className={cn(
+                            "p-3 rounded-2xl transition-colors hover:bg-white/50 backdrop-blur-sm",
+                            isFocus ? "text-teal-600 hover:text-teal-800" : "text-rose-600 hover:text-rose-800"
+                        )}
+                        title="Reset"
+                    >
+                        <RotateCcw className="w-6 h-6" />
+                    </button>
+                    
+                    <button
+                        onClick={switchMode}
+                        className={cn(
+                            "p-3 rounded-2xl transition-colors hover:bg-white/50 backdrop-blur-sm",
+                            isFocus ? "text-teal-600 hover:text-teal-800" : "text-rose-600 hover:text-rose-800"
+                        )}
+                        title="Skip"
+                    >
+                        <SkipForward className="w-6 h-6" />
+                    </button>
+                </div>
             </div>
 
-            {/* Footer Info */}
+            {/* Footer / Status */}
             <div className={cn(
-                "absolute bottom-8 flex gap-8 opacity-50 text-sm font-medium",
-                isFocus ? "text-zinc-500" : "text-orange-300"
+                "absolute bottom-10 flex gap-6 px-6 py-3 rounded-full bg-white/40 backdrop-blur-md shadow-sm border border-white/50",
+                isFocus ? "text-teal-700" : "text-rose-700"
             )}>
                 <div className="flex items-center gap-2">
-                    <Coffee className="w-4 h-4" /> Mokumoku 25m
+                    <div className={cn("w-2 h-2 rounded-full", isFocus ? "bg-teal-400" : "bg-gray-300")} />
+                    <span className="text-xs font-bold">Moku 25m</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <MessageCircle className="w-4 h-4" /> Chat 5m
+                    <div className={cn("w-2 h-2 rounded-full", !isFocus ? "bg-rose-400" : "bg-gray-300")} />
+                    <span className="text-xs font-bold">Chat 5m</span>
                 </div>
             </div>
 
