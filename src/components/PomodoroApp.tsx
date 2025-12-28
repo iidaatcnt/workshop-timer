@@ -2,8 +2,8 @@
 
 import { usePomodoro } from '@/hooks/usePomodoro';
 import { cn } from '@/lib/utils';
-import { Play, Pause, RotateCcw, SkipForward, Utensils, Leaf, ChefHat } from 'lucide-react';
-import { useCallback } from 'react';
+import { Play, Pause, RotateCcw, SkipForward, Utensils, Leaf, ChefHat, MessageCircle } from 'lucide-react';
+import { useCallback, useState } from 'react';
 
 export function PomodoroApp() {
     // Sound Effect using Web Audio API
@@ -41,6 +41,7 @@ export function PomodoroApp() {
     }, []);
 
     const { mode, timeLeft, isActive, toggleTimer, resetTimer, switchMode } = usePomodoro(playAlarm);
+    const [message, setMessage] = useState("ヤルまたはめちゃヤル");
 
     // Format time mm:ss
     const formatTime = (seconds: number) => {
@@ -54,12 +55,12 @@ export function PomodoroApp() {
 
     return (
         <div className={cn(
-            "min-h-screen w-full flex flex-col items-center justify-center transition-colors duration-700 ease-in-out font-sans overflow-hidden",
+            "min-h-screen w-full flex flex-col items-center justify-center py-12 transition-colors duration-700 ease-in-out font-sans overflow-y-auto",
             isFocus ? "bg-[#FFF0EB]" : "bg-[#F0FDF4]" // Very light red vs light green
         )}>
 
             {/* Header */}
-            <header className="absolute top-8 md:top-12 z-20 text-center space-y-2">
+            <header className="z-20 text-center space-y-4 mb-12">
                 <div className={cn(
                     "inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold shadow-sm mb-1 transition-colors",
                     isFocus ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
@@ -74,15 +75,35 @@ export function PomodoroApp() {
                     {isFocus ? "POMODORO" : "BASIL BREAK"}
                 </h1>
                 <p className={cn(
-                    "font-medium",
+                    "font-medium mb-4",
                     isFocus ? "text-red-400" : "text-green-500"
                 )}>
-                    {isFocus ? "美味しい時間を育てましょう �" : "少し休憩してリフレッシュ 🌿"}
+                    {isFocus ? "美味しい時間を育てましょう 🍅" : "少し休憩してリフレッシュ 🌿"}
                 </p>
+
+                {/* Custom Message Input */}
+                <div className="relative max-w-[300px] mx-auto group">
+                    <input
+                        type="text"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="メッセージを入力..."
+                        className={cn(
+                            "w-full bg-white/50 backdrop-blur-md border-2 rounded-xl px-4 py-2 pl-10 text-center font-bold transition-all outline-none focus:ring-2",
+                            isFocus
+                                ? "border-red-200 text-red-700 focus:ring-red-400 focus:border-red-400"
+                                : "border-green-200 text-green-700 focus:ring-green-400 focus:border-green-400"
+                        )}
+                    />
+                    <MessageCircle className={cn(
+                        "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4",
+                        isFocus ? "text-red-400" : "text-green-400"
+                    )} />
+                </div>
             </header>
 
             {/* Main Timer (The Tomato) */}
-            <div className="relative z-10 mt-16 md:mt-0">
+            <div className="relative z-10">
 
                 {/* Cute Leaf Decoration on top of the tomato */}
                 <div className={cn(
@@ -154,7 +175,7 @@ export function PomodoroApp() {
 
             {/* Footer */}
             <div className={cn(
-                "absolute bottom-8 flex gap-8 font-medium text-sm transition-colors",
+                "mt-16 flex gap-8 font-medium text-sm transition-colors",
                 isFocus ? "text-red-400" : "text-green-400"
             )}>
                 <div className="flex items-center gap-2">
