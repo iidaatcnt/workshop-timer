@@ -2,7 +2,7 @@
 
 import { usePomodoro } from '@/hooks/usePomodoro';
 import { cn } from '@/lib/utils';
-import { Play, Pause, RotateCcw, SkipForward, Utensils, Leaf, ChefHat, MessageCircle } from 'lucide-react';
+import { Play, Pause, RotateCcw, SkipForward, Utensils, Leaf, ChefHat, MessageCircle, Plus, Minus } from 'lucide-react';
 import { useCallback, useState } from 'react';
 
 export function PomodoroApp() {
@@ -40,7 +40,7 @@ export function PomodoroApp() {
         }
     }, []);
 
-    const { mode, timeLeft, isActive, toggleTimer, resetTimer, switchMode } = usePomodoro(playAlarm);
+    const { mode, timeLeft, isActive, toggleTimer, resetTimer, switchMode, adjustTime, focusTime, breakTime } = usePomodoro(playAlarm);
     const [message, setMessage] = useState("ヤルまたはめちゃヤル");
 
     // Format time mm:ss
@@ -102,36 +102,62 @@ export function PomodoroApp() {
                 </div>
             </header>
 
-            {/* Main Timer (The Tomato) */}
-            <div className="relative z-10">
+            {/* Main Timer (The Tomato) with Adjustment Buttons */}
+            <div className="relative z-10 flex items-center justify-center gap-4 md:gap-8">
 
-                {/* Cute Leaf Decoration on top of the tomato */}
-                <div className={cn(
-                    "absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 z-20 transition-all duration-700 origin-bottom",
-                    isFocus ? "rotate-0 scale-100" : "rotate-12 scale-90 opacity-80"
-                )}>
-                    <svg viewBox="0 0 100 100" className="fill-green-500 drop-shadow-sm">
-                        <path d="M50 50 Q70 10 90 30 T50 50 Q30 90 10 70 T50 50" />
-                        <path d="M50 50 Q30 10 10 30 T50 50 Q70 90 90 70 T50 50" />
-                    </svg>
+                {/* Minus Button */}
+                <button
+                    onClick={() => adjustTime(-60)}
+                    className={cn(
+                        "p-4 rounded-full shadow-lg transition-transform hover:scale-110 active:scale-90 border-2 bg-white",
+                        isFocus ? "text-red-500 border-red-100" : "text-green-500 border-green-100"
+                    )}
+                    aria-label="Decrease time"
+                >
+                    <Minus className="w-6 h-6 md:w-8 md:h-8" />
+                </button>
+
+                <div className="relative">
+                    {/* Cute Leaf Decoration on top of the tomato */}
+                    <div className={cn(
+                        "absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 z-20 transition-all duration-700 origin-bottom",
+                        isFocus ? "rotate-0 scale-100" : "rotate-12 scale-90 opacity-80"
+                    )}>
+                        <svg viewBox="0 0 100 100" className="fill-green-500 drop-shadow-sm">
+                            <path d="M50 50 Q70 10 90 30 T50 50 Q30 90 10 70 T50 50" />
+                            <path d="M50 50 Q30 10 10 30 T50 50 Q70 90 90 70 T50 50" />
+                        </svg>
+                    </div>
+
+                    <div className={cn(
+                        "relative w-72 h-72 md:w-80 md:h-80 rounded-full flex flex-col items-center justify-center shadow-2xl transition-all duration-700 border-4",
+                        isFocus
+                            ? "bg-red-500 border-red-600 shadow-red-200"
+                            : "bg-green-500 border-green-600 shadow-green-200"
+                    )}>
+                        {/* Glossy reflection for tomato effect */}
+                        <div className="absolute top-4 left-4 w-1/3 h-1/3 rounded-full bg-gradient-to-br from-white/40 to-transparent blur-sm" />
+
+                        <span className="text-7xl md:text-8xl font-black tracking-tighter text-white drop-shadow-md z-10 tabular-nums">
+                            {formatTime(timeLeft)}
+                        </span>
+                        <span className="text-white/80 font-bold uppercase tracking-widest mt-2 z-10 text-sm">
+                            {isActive ? (isFocus ? "Cooking..." : "Resting...") : "Ready?"}
+                        </span>
+                    </div>
                 </div>
 
-                <div className={cn(
-                    "relative w-72 h-72 md:w-80 md:h-80 rounded-full flex flex-col items-center justify-center shadow-2xl transition-all duration-700 border-4",
-                    isFocus
-                        ? "bg-red-500 border-red-600 shadow-red-200"
-                        : "bg-green-500 border-green-600 shadow-green-200"
-                )}>
-                    {/* Glossy reflection for tomato effect */}
-                    <div className="absolute top-4 left-4 w-1/3 h-1/3 rounded-full bg-gradient-to-br from-white/40 to-transparent blur-sm" />
-
-                    <span className="text-7xl md:text-8xl font-black tracking-tighter text-white drop-shadow-md z-10 tabular-nums">
-                        {formatTime(timeLeft)}
-                    </span>
-                    <span className="text-white/80 font-bold uppercase tracking-widest mt-2 z-10 text-sm">
-                        {isActive ? (isFocus ? "Cooking..." : "Resting...") : "Ready?"}
-                    </span>
-                </div>
+                {/* Plus Button */}
+                <button
+                    onClick={() => adjustTime(60)}
+                    className={cn(
+                        "p-4 rounded-full shadow-lg transition-transform hover:scale-110 active:scale-90 border-2 bg-white",
+                        isFocus ? "text-red-500 border-red-100" : "text-green-500 border-green-100"
+                    )}
+                    aria-label="Increase time"
+                >
+                    <Plus className="w-6 h-6 md:w-8 md:h-8" />
+                </button>
             </div>
 
             {/* Controls */}
@@ -180,11 +206,11 @@ export function PomodoroApp() {
             )}>
                 <div className="flex items-center gap-2">
                     <div className={cn("w-3 h-3 rounded-full", isFocus ? "bg-red-500" : "bg-red-200")} />
-                    Pomodoro 25m
+                    Pomodoro {Math.floor(focusTime / 60)}m
                 </div>
                 <div className="flex items-center gap-2">
                     <div className={cn("w-3 h-3 rounded-full", !isFocus ? "bg-green-500" : "bg-green-200")} />
-                    Break 5m
+                    Break {Math.floor(breakTime / 60)}m
                 </div>
             </div>
 

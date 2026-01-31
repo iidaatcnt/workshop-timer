@@ -2,29 +2,48 @@ import { useState, useEffect, useCallback } from 'react';
 
 export type TimerMode = 'focus' | 'break';
 
-const FOCUS_TIME = 25 * 60; // 25 minutes
-const BREAK_TIME = 5 * 60;  // 5 minutes
+const DEFAULT_FOCUS_TIME = 25 * 60;
+const DEFAULT_BREAK_TIME = 5 * 60;
 
 export function usePomodoro(onComplete?: () => void) {
     const [mode, setMode] = useState<TimerMode>('focus');
-    const [timeLeft, setTimeLeft] = useState(FOCUS_TIME);
+    const [focusTime, setFocusTime] = useState(DEFAULT_FOCUS_TIME);
+    const [breakTime, setBreakTime] = useState(DEFAULT_BREAK_TIME);
+    const [timeLeft, setTimeLeft] = useState(DEFAULT_FOCUS_TIME);
     const [isActive, setIsActive] = useState(false);
 
     // Switch modes automatically or manually
     const switchMode = useCallback(() => {
         const nextMode = mode === 'focus' ? 'break' : 'focus';
         setMode(nextMode);
-        setTimeLeft(nextMode === 'focus' ? FOCUS_TIME : BREAK_TIME);
+        setTimeLeft(nextMode === 'focus' ? focusTime : breakTime);
         setIsActive(false);
-    }, [mode]);
+    }, [mode, focusTime, breakTime]);
 
     const toggleTimer = useCallback(() => {
         setIsActive(!isActive);
     }, [isActive]);
 
     const resetTimer = useCallback(() => {
-        setTimeLeft(mode === 'focus' ? FOCUS_TIME : BREAK_TIME);
+        setTimeLeft(mode === 'focus' ? focusTime : breakTime);
         setIsActive(false);
+    }, [mode, focusTime, breakTime]);
+
+    const adjustTime = useCallback((amount: number) => {
+        if (mode === 'focus') {
+            setFocusTime(prev => {
+                const updated = Math.max(60, prev + amount);
+                return updated;
+            });
+            // Also adjust current timeLeft to reflect the change immediately
+            setTimeLeft(prev => Math.max(0, prev + amount));
+        } else {
+            setBreakTime(prev => {
+                const updated = Math.max(60, prev + amount);
+                return updated;
+            });
+            setTimeLeft(prev => Math.max(0, prev + amount));
+        }
     }, [mode]);
 
     useEffect(() => {
@@ -52,6 +71,9 @@ export function usePomodoro(onComplete?: () => void) {
         toggleTimer,
         resetTimer,
         switchMode,
-        progress: 1 - timeLeft / (mode === 'focus' ? FOCUS_TIME : BREAK_TIME)
+        adjustTime,
+        focusTime,
+        breakTime,
+        progress: 1 - timeLeft / (mode === 'focus' ? focusTime : breakTime)
     };
 }
