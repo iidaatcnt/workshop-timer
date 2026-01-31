@@ -3,7 +3,7 @@
 import { usePomodoro } from '@/hooks/usePomodoro';
 import { cn } from '@/lib/utils';
 import { Play, Pause, RotateCcw, SkipForward, Utensils, Leaf, ChefHat, MessageCircle, Plus, Minus } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 
 export function PomodoroApp() {
     // Sound Effect using Web Audio API
@@ -40,7 +40,43 @@ export function PomodoroApp() {
         }
     }, []);
 
+    const playCountdown = useCallback(() => {
+        try {
+            const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+            if (!AudioContext) return;
+
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            // A cute "pop" sound for countdown
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(1000, ctx.currentTime + 0.1);
+
+            gain.gain.setValueAtTime(0, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.15);
+        } catch (e) {
+            console.error("Audio play failed", e);
+        }
+    }, []);
+
     const { mode, timeLeft, isActive, toggleTimer, resetTimer, switchMode, adjustTime, focusTime, breakTime } = usePomodoro(playAlarm);
+
+    // Trigger countdown sound
+    useEffect(() => {
+        if (isActive && timeLeft > 0 && timeLeft <= 3) {
+            playCountdown();
+        }
+    }, [timeLeft, isActive, playCountdown]);
+
     const [message, setMessage] = useState("ヤルまたはめちゃヤル");
 
     // Format time mm:ss
