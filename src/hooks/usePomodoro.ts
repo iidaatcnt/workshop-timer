@@ -11,6 +11,7 @@ export function usePomodoro(onComplete?: () => void) {
     const [breakTime, setBreakTime] = useState(DEFAULT_BREAK_TIME);
     const [timeLeft, setTimeLeft] = useState(DEFAULT_FOCUS_TIME);
     const [isActive, setIsActive] = useState(false);
+    const [isAutoLoop, setIsAutoLoop] = useState(false);
 
     // Switch modes automatically or manually
     const switchMode = useCallback(() => {
@@ -23,6 +24,10 @@ export function usePomodoro(onComplete?: () => void) {
     const toggleTimer = useCallback(() => {
         setIsActive(!isActive);
     }, [isActive]);
+
+    const toggleAutoLoop = useCallback(() => {
+        setIsAutoLoop(prev => !prev);
+    }, []);
 
     const resetTimer = useCallback(() => {
         setTimeLeft(mode === 'focus' ? focusTime : breakTime);
@@ -55,23 +60,33 @@ export function usePomodoro(onComplete?: () => void) {
             }, 1000);
         } else if (timeLeft === 0 && isActive) {
             // Timer finished naturally
-            setIsActive(false);
             if (onComplete) {
                 onComplete();
+            }
+
+            if (isAutoLoop) {
+                const nextMode = mode === 'focus' ? 'break' : 'focus';
+                setMode(nextMode);
+                setTimeLeft(nextMode === 'focus' ? focusTime : breakTime);
+                // Keep isActive = true to continue to the next session automatically
+            } else {
+                setIsActive(false);
             }
         }
 
         return () => clearInterval(interval);
-    }, [isActive, timeLeft, onComplete]);
+    }, [isActive, timeLeft, onComplete, isAutoLoop, mode, focusTime, breakTime]);
 
     return {
         mode,
         timeLeft,
         isActive,
+        isAutoLoop,
         toggleTimer,
         resetTimer,
         switchMode,
         adjustTime,
+        toggleAutoLoop,
         focusTime,
         breakTime,
         progress: 1 - timeLeft / (mode === 'focus' ? focusTime : breakTime)

@@ -68,7 +68,7 @@ export function PomodoroApp() {
         }
     }, []);
 
-    const { mode, timeLeft, isActive, toggleTimer, resetTimer, switchMode, adjustTime, focusTime, breakTime } = usePomodoro(playAlarm);
+    const { mode, timeLeft, isActive, isAutoLoop, toggleAutoLoop, toggleTimer, resetTimer, switchMode, adjustTime, focusTime, breakTime } = usePomodoro(playAlarm);
 
     // Trigger countdown sound
     useEffect(() => {
@@ -237,7 +237,7 @@ export function PomodoroApp() {
 
             {/* Footer */}
             <div className={cn(
-                "mt-16 flex gap-8 font-medium text-sm transition-colors",
+                "mt-16 flex items-center gap-8 font-medium text-sm transition-colors flex-wrap justify-center",
                 isFocus ? "text-red-400" : "text-green-400"
             )}>
                 <div className="flex items-center gap-2">
@@ -247,6 +247,28 @@ export function PomodoroApp() {
                 <div className="flex items-center gap-2">
                     <div className={cn("w-3 h-3 rounded-full", !isFocus ? "bg-green-500" : "bg-green-200")} />
                     Break {Math.floor(breakTime / 60)}m
+                </div>
+
+                {/* Auto Loop Toggle */}
+                <div className="flex items-center gap-2 ml-2 sm:ml-4">
+                    <button
+                        onClick={toggleAutoLoop}
+                        className={cn(
+                            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none shadow-inner",
+                            isAutoLoop
+                                ? (isFocus ? "bg-red-500" : "bg-green-500")
+                                : "bg-black/10"
+                        )}
+                        aria-label="Toggle Auto Loop"
+                    >
+                        <span
+                            className={cn(
+                                "inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out",
+                                isAutoLoop ? "translate-x-6" : "translate-x-1"
+                            )}
+                        />
+                    </button>
+                    <span className="font-bold opacity-80 uppercase tracking-wider text-xs">Loop</span>
                 </div>
             </div>
 
