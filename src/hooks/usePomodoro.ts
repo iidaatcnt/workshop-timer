@@ -11,7 +11,7 @@ export function usePomodoro(onComplete?: () => void) {
     const [breakTime, setBreakTime] = useState(DEFAULT_BREAK_TIME);
     const [timeLeft, setTimeLeft] = useState(DEFAULT_FOCUS_TIME);
     const [isActive, setIsActive] = useState(false);
-    const [isAutoLoop, setIsAutoLoop] = useState(false);
+    const [isAutoLoop, setIsAutoLoop] = useState(true);
 
     // Switch modes automatically or manually
     const switchMode = useCallback(() => {
