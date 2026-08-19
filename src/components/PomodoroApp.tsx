@@ -145,35 +145,47 @@ export function PomodoroApp() {
                 </button>
 
                 <div className="relative">
-                    <div className={cn(
-                        "absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 z-20 transition-all duration-700 origin-bottom",
-                        isFocus ? "rotate-0 scale-100" : "rotate-12 scale-90 opacity-80"
-                    )}>
-                        {isLongBreak ? (
-                            <div className="w-full h-full flex items-center justify-center">
-                                <img src="/teatime.jpg" alt="British Tea Time" className="w-full h-full object-contain drop-shadow-md" />
-                            </div>
-                        ) : (
+                    {/* ヘタ装飾：Long Break時は非表示 */}
+                    {!isLongBreak && (
+                        <div className={cn(
+                            "absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-24 z-20 transition-all duration-700 origin-bottom",
+                            isFocus ? "rotate-0 scale-100" : "rotate-12 scale-90 opacity-80"
+                        )}>
                             <svg viewBox="0 0 100 100" className="fill-green-500 drop-shadow-sm">
                                 <path d="M50 50 Q70 10 90 30 T50 50 Q30 90 10 70 T50 50" />
                                 <path d="M50 50 Q30 10 10 30 T50 50 Q70 90 90 70 T50 50" />
                             </svg>
-                        )}
-                    </div>
+                        </div>
+                    )}
 
                     <div className={cn(
-                        "relative w-72 h-72 md:w-80 md:h-80 rounded-full flex flex-col items-center justify-center shadow-2xl transition-all duration-700 border-4",
+                        "relative w-72 h-72 md:w-80 md:h-80 rounded-full flex flex-col items-center justify-center shadow-2xl transition-all duration-700 border-4 overflow-hidden",
                         isFocus
                             ? "bg-red-500 border-red-600 shadow-red-200"
                             : isLongBreak
-                            ? "bg-indigo-500 border-indigo-600 shadow-indigo-200"
+                            ? "border-indigo-300 shadow-indigo-200"
                             : "bg-green-500 border-green-600 shadow-green-200"
                     )}>
-                        <div className="absolute top-4 left-4 w-1/3 h-1/3 rounded-full bg-gradient-to-br from-white/40 to-transparent blur-sm" />
+                        {/* Long Break: 画像を円の背景に */}
+                        {isLongBreak && (
+                            <img
+                                src="/teatime.jpg"
+                                alt="British Tea Time"
+                                className="absolute inset-0 w-full h-full object-cover"
+                            />
+                        )}
+                        {/* 光沢エフェクト */}
+                        {!isLongBreak && (
+                            <div className="absolute top-4 left-4 w-1/3 h-1/3 rounded-full bg-gradient-to-br from-white/40 to-transparent blur-sm" />
+                        )}
+                        {/* Long Break時は文字を読みやすくする半透明オーバーレイ */}
+                        {isLongBreak && (
+                            <div className="absolute inset-0 bg-indigo-900/40" />
+                        )}
                         <span className="text-7xl md:text-8xl font-black tracking-tighter text-white drop-shadow-md z-10 tabular-nums">
                             {formatTime(timeLeft)}
                         </span>
-                        <span className="text-white/80 font-bold uppercase tracking-widest mt-2 z-10 text-sm">
+                        <span className="text-white/90 font-bold uppercase tracking-widest mt-2 z-10 text-sm drop-shadow-md">
                             {isActive ? (isFocus ? "Cooking..." : "Resting...") : "Ready?"}
                         </span>
                     </div>
