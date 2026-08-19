@@ -150,7 +150,9 @@ export function PomodoroApp() {
                         isFocus ? "rotate-0 scale-100" : "rotate-12 scale-90 opacity-80"
                     )}>
                         {isLongBreak ? (
-                            <div className="w-full h-full flex items-center justify-center text-5xl">☕</div>
+                            <div className="w-full h-full flex items-center justify-center">
+                                <img src="/teatime.jpg" alt="British Tea Time" className="w-full h-full object-contain drop-shadow-md" />
+                            </div>
                         ) : (
                             <svg viewBox="0 0 100 100" className="fill-green-500 drop-shadow-sm">
                                 <path d="M50 50 Q70 10 90 30 T50 50 Q30 90 10 70 T50 50" />
